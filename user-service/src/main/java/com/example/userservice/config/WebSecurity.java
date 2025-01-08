@@ -24,8 +24,9 @@ public class WebSecurity {
                                                         AntPathRequestMatcher.antMatcher("/auth/**")
                                                 ).authenticated()
                                                 .requestMatchers(
-                                                        AntPathRequestMatcher.antMatcher("/h2-console/**"),
-                                                        AntPathRequestMatcher.antMatcher("/users/**")
+//                                                        AntPathRequestMatcher.antMatcher("/h2-console/**"),
+//                                                        AntPathRequestMatcher.antMatcher("/users/**")
+                                                        AntPathRequestMatcher.antMatcher("/**")
                                                 ).permitAll()
                 )
                 .headers(
