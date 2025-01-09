@@ -41,3 +41,8 @@ spring:
           predicates:
             - Path=/catalog-service/**
           filters:
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/order-service/**
+          filters:
