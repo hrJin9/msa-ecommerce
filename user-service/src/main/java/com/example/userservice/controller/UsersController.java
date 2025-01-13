@@ -2,7 +2,6 @@ package com.example.userservice.controller;
 
 import com.example.userservice.dto.UserDto;
 import com.example.userservice.service.UserService;
-import com.example.userservice.vo.Greeting;
 import com.example.userservice.vo.RequestUser;
 import com.example.userservice.vo.ResponseUser;
 import jakarta.validation.Valid;
@@ -15,23 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user-service")
 @RequiredArgsConstructor
 public class UsersController {
-    private final Greeting greeting;
     private final UserService userService;
     private final Environment env;
     private final ModelMapper mapper;
 
-    @GetMapping("/health_check")
-    public String status() {
-        return String.format("It's Working in User Service on Port %s", env.getProperty("local.server.port"));
-    }
-
-    @GetMapping("/welcome")
-    public String welcome() {
-        return greeting.getMessage();
-    }
 
     @PostMapping("/users")
     public ResponseEntity<ResponseUser> createUser(@RequestBody @Valid RequestUser user) {

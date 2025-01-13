@@ -30,5 +30,10 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
-greeting:
-  message: Welcome to the Simple E-Commerce.
+
+
+
+
+logging:
+  level:
+    com.example.userservice: DEBUG
