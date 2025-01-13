@@ -1,8 +1,8 @@
 package com.example.userservice.security;
 
 import com.example.userservice.service.UserService;
-import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -24,15 +24,15 @@ import java.util.function.Supplier;
 @Configuration
 @RequiredArgsConstructor
 public class WebSecurity {
+    private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ObjectPostProcessor<Object> objectPostProcessor;
-    private final UserService userService;
 
     private static final String ALLOWED_IP_ADDRESS = "127.0.0.1";
     private static final String[] WHITE_LIST = {
             "/users/**",
-            "/",
-            "/**"
+            "/"
+//            "/**"
     };
 
     @Bean
@@ -59,20 +59,19 @@ public class WebSecurity {
                 ));
     }
 
-    private AuthenticationManager authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
+    private AuthenticationManager getAuthenticationManager() throws Exception {
+        AuthenticationManagerBuilder auth = new AuthenticationManagerBuilder(objectPostProcessor);
         auth.userDetailsService(userService)
-                .passwordEncoder(bCryptPasswordEncoder);
+            .passwordEncoder(bCryptPasswordEncoder);
         return auth.build();
     }
 
     private AuthenticationFilter getAuthenticationFilter() throws Exception {
-        AuthenticationManagerBuilder builder = new AuthenticationManagerBuilder(objectPostProcessor);
-        builder.userDetailsService(userService)
-                .passwordEncoder(bCryptPasswordEncoder);
-
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter(userService);
-        authenticationFilter.setAuthenticationManager(authenticationManager(builder));
-        return authenticationFilter;
+        return new AuthenticationFilter(
+                getAuthenticationManager(),
+                userService
+        );
     }
+
 
 }

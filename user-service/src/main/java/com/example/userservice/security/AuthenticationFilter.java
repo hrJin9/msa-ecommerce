@@ -4,12 +4,16 @@ import com.example.userservice.dto.UserDto;
 import com.example.userservice.service.UserService;
 import com.example.userservice.vo.RequestLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -18,11 +22,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Slf4j
-@RequiredArgsConstructor
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final UserService userService;
+
+    @Value("${token.expiration_time}")
+    private String expirationTime;
+
+    @Value("${token.secret}")
+    private String secret;
+
+    public AuthenticationFilter(AuthenticationManager authenticationManager,
+                                UserService userService) {
+        super.setAuthenticationManager(authenticationManager);
+        this.userService = userService;
+    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
@@ -49,5 +65,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             Authentication authResult) throws IOException, ServletException {
         String userName = ((User) authResult.getPrincipal()).getUsername();
         UserDto userDto = userService.getUserDetailsByEmail(userName);
+
+        String token = Jwts.builder()
+                .setSubject(userDto.getUserId())
+                .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(expirationTime)))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
+
+        response.addHeader("token", token);
+        response.addHeader("userId", userDto.getUserId());
     }
+
 }
