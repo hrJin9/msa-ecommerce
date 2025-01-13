@@ -6,6 +6,7 @@ import com.example.userservice.vo.RequestLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,23 +22,24 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 
 @Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final UserService userService;
-
-    @Value("${token.expiration_time}")
-    private String expirationTime;
-
-    @Value("${token.secret}")
-    private String secret;
+    private final String expirationTime;
+    private final String secret;
 
     public AuthenticationFilter(AuthenticationManager authenticationManager,
-                                UserService userService) {
+                                UserService userService,
+                                String expirationTime,
+                                String secret) {
         super.setAuthenticationManager(authenticationManager);
         this.userService = userService;
+        this.expirationTime = expirationTime;
+        this.secret = secret;
     }
 
     @Override
@@ -69,7 +71,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         String token = Jwts.builder()
                 .setSubject(userDto.getUserId())
                 .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(expirationTime)))
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
                 .compact();
 
         response.addHeader("token", token);

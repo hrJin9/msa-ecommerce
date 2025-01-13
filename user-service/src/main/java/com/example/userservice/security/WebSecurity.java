@@ -28,11 +28,17 @@ public class WebSecurity {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ObjectPostProcessor<Object> objectPostProcessor;
 
+    @Value("${token.expiration_time}")
+    private String expirationTime;
+
+    @Value("${token.secret}")
+    private String secret;
+
     private static final String ALLOWED_IP_ADDRESS = "127.0.0.1";
     private static final String[] WHITE_LIST = {
             "/users/**",
-            "/"
-//            "/**"
+            "/",
+            "/**"
     };
 
     @Bean
@@ -69,7 +75,9 @@ public class WebSecurity {
     private AuthenticationFilter getAuthenticationFilter() throws Exception {
         return new AuthenticationFilter(
                 getAuthenticationManager(),
-                userService
+                userService,
+                expirationTime,
+                secret
         );
     }
 
