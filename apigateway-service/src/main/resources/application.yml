@@ -26,16 +26,20 @@ spring:
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
-              - Path=/user-service/**
+            - Path=/user-service/**
+            - Method=POST
           filters:
-#            - AddRequestHeader=first-request, first-requests-header2
-#            - AddResponseHeader=first-response, first-response-header2
-#            - CustomFilter
-#            - name: LoggingFilter
-#              args:
-#                baseMessage: Hi, there.
-#                preLogger: true
-#                postLogger: true
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /\${segment}
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /\${segment}
+            - AuthorizationHeaderFilter #헤더에 JWT 정보가 들어있는지 검사
         - id: catalog-service
           uri: lb://CATALOG-SERVICE
           predicates:
@@ -46,3 +50,6 @@ spring:
           predicates:
             - Path=/order-service/**
           filters:
+
+token:
+  secret: usertokenforjwtsforlongnumberwherecanitbegothrough
