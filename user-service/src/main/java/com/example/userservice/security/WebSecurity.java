@@ -65,16 +65,14 @@ public class WebSecurity {
                 ));
     }
 
-    private AuthenticationManager getAuthenticationManager() throws Exception {
+    private AuthenticationFilter getAuthenticationFilter() throws Exception {
         AuthenticationManagerBuilder auth = new AuthenticationManagerBuilder(objectPostProcessor);
         auth.userDetailsService(userService)
-            .passwordEncoder(bCryptPasswordEncoder);
-        return auth.build();
-    }
+                .passwordEncoder(bCryptPasswordEncoder);
+        AuthenticationManager authenticationManager = auth.build();
 
-    private AuthenticationFilter getAuthenticationFilter() throws Exception {
         return new AuthenticationFilter(
-                getAuthenticationManager(),
+                authenticationManager,
                 userService,
                 expirationTime,
                 secret
