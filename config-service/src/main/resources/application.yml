@@ -4,8 +4,23 @@ server:
 spring:
   application:
     name: config-service
+  profiles:
+    active: native
   cloud:
     config:
       server:
-        git:
-          uri: file://C:\devProjects\private\MSA\git-local-repo
+        native:
+          search-locations: file:///C:/devProjects/private/MSA/native-file-repo
+#        git:
+#          uri: https://github.com/hrJin9/msa-cloudconfig
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672 #web접속은 15672
+    username: guest
+    password: guest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, busrefresh #사용할 acturator endpoints
