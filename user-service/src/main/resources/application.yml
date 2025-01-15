@@ -18,6 +18,11 @@ spring:
       settings:
         web-allow-others: true
       path: /h2-console
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672 #web접속은 15672
+    username: guest
+    password: guest
 
 eureka:
   instance:
@@ -34,6 +39,8 @@ logging:
   level:
     com.example.userservice: DEBUG
 
-#token:
-#  expiration_time: 86400000 # 1Day
-#  secret: usertokenforjwtsforlongnumberwherecanitbegothrough
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, busrefresh #사용할 acturator endpoints

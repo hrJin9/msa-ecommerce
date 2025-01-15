@@ -36,9 +36,7 @@ public class WebSecurity {
 
     private static final String ALLOWED_IP_ADDRESS = "127.0.0.1";
     private static final String[] WHITE_LIST = {
-            "/users/**",
-            "/",
-            "/**"
+            "/actuator/**"
     };
 
     @Bean
@@ -60,8 +58,7 @@ public class WebSecurity {
     private AuthorizationDecision hasIpAddress(Supplier<Authentication> authentication, RequestAuthorizationContext object) {
         IpAddressMatcher ipAddressMatcher = new IpAddressMatcher(ALLOWED_IP_ADDRESS);
         return new AuthorizationDecision(
-                !(authentication.get() instanceof AnonymousAuthenticationToken)
-                        && ipAddressMatcher.matches(object.getRequest()
+                ipAddressMatcher.matches(object.getRequest()
                 ));
     }
 

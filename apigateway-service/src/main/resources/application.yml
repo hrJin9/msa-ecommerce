@@ -26,6 +26,14 @@ spring:
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
+            - Path=/user-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /\${segment}
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
             - Path=/user-service/**
             - Method=POST
           filters:
@@ -50,6 +58,14 @@ spring:
           predicates:
             - Path=/order-service/**
           filters:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672 #web접속은 15672
+    username: guest
+    password: guest
 
-token:
-  secret: usertokenforjwtsforlongnumberwherecanitbegothrough
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, httptrace, busrefresh
